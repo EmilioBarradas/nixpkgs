@@ -22,9 +22,13 @@ maven.buildMavenPackage rec {
   mvnParameters = "assembly:single";
   mvnHash = "sha256-GFMBUvJSvcfC8OwpjJ0Ee9Z/IrvObcWl6RJqs2NcKhQ=";
 
-  nativeBuildInputs = [makeWrapper];
+  nativeBuildInputs = [ makeWrapper ];
 
-  linkedLibraries = with pkgs; [libxkbcommon xorg.libX11 xorg.libXt];
+  linkedLibraries = with pkgs; [
+    libxkbcommon
+    xorg.libX11
+    xorg.libXt
+  ];
 
   installPhase = ''
     runHook preInstall
@@ -40,6 +44,6 @@ maven.buildMavenPackage rec {
   meta = {
     description = "Accurate stronghold calculator for Minecraft speedrunning.";
     homepage = "https://github.com/Ninjabrain1/Ninjabrain-Bot";
-    maintainers = with lib.maintainers; [emilio-barradas];
+    maintainers = with lib.maintainers; [ emilio-barradas ];
   };
 }
