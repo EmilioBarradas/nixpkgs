@@ -59,6 +59,6 @@ maven.buildMavenPackage rec {
   meta = {
     description = "Accurate stronghold calculator for Minecraft speedrunning.";
     homepage = "https://github.com/Ninjabrain1/Ninjabrain-Bot";
-    maintainers = with lib.maintainers; [emilio-barradas];
+    maintainers = with lib.maintainers; [ emilio-barradas ];
   };
 }
