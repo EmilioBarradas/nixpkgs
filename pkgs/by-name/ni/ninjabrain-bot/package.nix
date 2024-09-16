@@ -1,7 +1,9 @@
 {
+  copyDesktopItems,
   fetchFromGitHub,
   jre ? pkgs.jre,
   lib,
+  makeDesktopItem,
   makeWrapper,
   maven,
   pkgs,
@@ -22,7 +24,10 @@ maven.buildMavenPackage rec {
   mvnParameters = "assembly:single";
   mvnHash = "sha256-GFMBUvJSvcfC8OwpjJ0Ee9Z/IrvObcWl6RJqs2NcKhQ=";
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    copyDesktopItems
+    makeWrapper
+  ];
 
   linkedLibraries = with pkgs; [
     libxkbcommon
@@ -40,6 +45,16 @@ maven.buildMavenPackage rec {
 
     runHook postInstall
   '';
+
+  desktopItems = [
+    (makeDesktopItem {
+      name = "ninjabrain-bot";
+      type = "Application";
+      exec = "ninjabrain-bot";
+      comment = "Accurate stronghold calculator for Minecraft speedrunning.";
+      desktopName = "Ninjabrain Bot";
+    })
+  ];
 
   meta = {
     description = "Accurate stronghold calculator for Minecraft speedrunning.";
