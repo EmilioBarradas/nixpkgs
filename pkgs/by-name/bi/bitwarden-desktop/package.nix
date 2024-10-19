@@ -2,8 +2,7 @@
 , buildNpmPackage
 , cargo
 , copyDesktopItems
-, dbus
-, electron_31
+, electron_32
 , fetchFromGitHub
 , glib
 , gnome-keyring
@@ -26,16 +25,16 @@
 let
   description = "Secure and free password manager for all of your devices";
   icon = "bitwarden";
-  electron = electron_31;
+  electron = electron_32;
 in buildNpmPackage rec {
   pname = "bitwarden-desktop";
-  version = "2024.8.2";
+  version = "2024.9.0";
 
   src = fetchFromGitHub {
     owner = "bitwarden";
     repo = "clients";
     rev = "desktop-v${version}";
-    hash = "sha256-KATT4W2pP7VTcoHeshGx5VrBwlg3UqzKPcRY0Rzo7II=";
+    hash = "sha256-o5nRG2j73qheDOyeFfSga64D8HbTn1EUrCiN0W+Xn0w=";
   };
 
   patches = [
@@ -52,7 +51,7 @@ in buildNpmPackage rec {
   makeCacheWritable = true;
   npmFlags = [ "--engine-strict" "--legacy-peer-deps" ];
   npmWorkspace = "apps/desktop";
-  npmDepsHash = "sha256-SnrK26QaxHYKX0532rGBASjx9PwxKSsVFRzZ3Cs2GPk=";
+  npmDepsHash = "sha256-L7/frKCNlq0xr6T+aSqyEQ44yrIXwcpdU/djrhCJNNk=";
 
   cargoDeps = rustPlatform.fetchCargoTarball {
     name = "${pname}-${version}";
@@ -68,7 +67,7 @@ in buildNpmPackage rec {
       patches;
     patchFlags = [ "-p4" ];
     sourceRoot = "${src.name}/${cargoRoot}";
-    hash = "sha256-MjGKQky6LGtpG1maBWd+WkMZlnZfdl9Sm2dlvdD8ANw=";
+    hash = "sha256-y+6vaESiOeVrFJpZoOJ75onOpldqSsT2kqkMMzTDUmM=";
   };
   cargoRoot = "apps/desktop/desktop_native";
 
@@ -135,7 +134,6 @@ in buildNpmPackage rec {
   doCheck = true;
 
   nativeCheckInputs = [
-    dbus
     (gnome-keyring.override { useWrappedDaemon = false; })
   ];
 
@@ -146,14 +144,12 @@ in buildNpmPackage rec {
   checkPhase = ''
     runHook preCheck
 
-    pushd ${cargoRoot}
-    export HOME=$(mktemp -d)
-    export -f cargoCheckHook runHook _eval _callImplicitHook _logHook
-    export cargoCheckType=release
-    dbus-run-session \
-      --config-file=${dbus}/share/dbus-1/session.conf \
-      -- bash -e -c cargoCheckHook
-    popd
+    (
+      cd ${cargoRoot}
+      HOME=$(mktemp -d)
+      cargoCheckType=release
+      cargoCheckHook
+    )
 
     runHook postCheck
   '';
