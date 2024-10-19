@@ -698,7 +698,6 @@ let
           name = "biome";
           publisher = "biomejs";
           version = "2024.10.131712";
-          hash = "sha256-Pxbvj6e3nRwuLKmPEtE02JdHmZbyuXNh4T+FZKjBkWo=";
         };
         meta = {
           changelog = "https://github.com/biomejs/biome-vscode/blob/main/CHANGELOG.md";
