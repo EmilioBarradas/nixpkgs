@@ -4586,7 +4586,7 @@ let
           name = "svelte-vscode";
           publisher = "svelte";
           version = "109.1.0";
-          hash = "";
+          hash = "sha256-ozD9k/zfklwBJtc1WdC52hgJckxBgVRmcZOwSYboACM=";
         };
         meta = {
           changelog = "https://github.com/sveltejs/language-tools/releases";
