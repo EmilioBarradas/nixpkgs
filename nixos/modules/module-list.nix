@@ -48,6 +48,7 @@
   ./config/zram.nix
   ./hardware/acpilight.nix
   ./hardware/all-firmware.nix
+  ./hardware/apple-touchbar.nix
   ./hardware/bladeRF.nix
   ./hardware/brillo.nix
   ./hardware/ckb-next.nix
@@ -661,6 +662,7 @@
   ./services/logging/ulogd.nix
   ./services/mail/automx2.nix
   ./services/mail/clamsmtp.nix
+  ./services/mail/cyrus-imap.nix
   ./services/mail/davmail.nix
   ./services/mail/dkimproxy-out.nix
   ./services/mail/dovecot.nix
@@ -710,7 +712,6 @@
   ./services/matrix/mjolnir.nix
   ./services/matrix/mx-puppet-discord.nix
   ./services/matrix/pantalaimon.nix
-  ./services/matrix/matrix-sliding-sync.nix
   ./services/matrix/synapse.nix
   ./services/misc/airsonic.nix
   ./services/misc/amazon-ssm-agent.nix
@@ -1205,7 +1206,6 @@
   ./services/networking/shellhub-agent.nix
   ./services/networking/shorewall.nix
   ./services/networking/shorewall6.nix
-  ./services/networking/shout.nix
   ./services/networking/sing-box.nix
   ./services/networking/sitespeed-io.nix
   ./services/networking/skydns.nix
@@ -1381,6 +1381,7 @@
   ./services/video/photonvision.nix
   ./services/video/mediamtx.nix
   ./services/video/v4l2-relayd.nix
+  ./services/video/wivrn.nix
   ./services/wayland/cage.nix
   ./services/wayland/hypridle.nix
   ./services/web-apps/akkoma.nix
@@ -1471,6 +1472,7 @@
   ./services/web-apps/netbox.nix
   ./services/web-apps/nextcloud.nix
   ./services/web-apps/nextcloud-notify_push.nix
+  ./services/web-apps/nextcloud-whiteboard-server.nix
   ./services/web-apps/nextjs-ollama-llm-ui.nix
   ./services/web-apps/nexus.nix
   ./services/web-apps/nifi.nix
