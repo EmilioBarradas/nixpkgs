@@ -86,8 +86,8 @@ rec {
   nomad_1_10 = generic {
     buildGoModule = buildGo124Module;
     version = "1.10.0";
-    sha256 = "sha256-U02H6DPr1friQ9EwqD/wQnE2Fm20OE5xNccPDJfnsqI=";
-    vendorHash = "sha256-9GnwqkexJAxrhW9yJFaDTdSaZ+p+/dcMuhlusp4cmyw=";
+    sha256 = "";
+    vendorHash = "";
     license = lib.licenses.bsl11;
     passthru.tests.nomad = nixosTests.nomad;
     preCheck = ''
