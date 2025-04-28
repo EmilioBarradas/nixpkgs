@@ -81,11 +81,11 @@ rec {
   # Upstream partially documents used Go versions here
   # https://github.com/hashicorp/nomad/blob/master/contributing/golang.md
 
-  nomad = nomad_1_9;
+  nomad = nomad_1_10;
 
-  nomad_1_9 = generic {
+  nomad_1_10 = generic {
     buildGoModule = buildGo124Module;
-    version = "1.9.7";
+    version = "1.10.0";
     sha256 = "sha256-U02H6DPr1friQ9EwqD/wQnE2Fm20OE5xNccPDJfnsqI=";
     vendorHash = "sha256-9GnwqkexJAxrhW9yJFaDTdSaZ+p+/dcMuhlusp4cmyw=";
     license = lib.licenses.bsl11;
