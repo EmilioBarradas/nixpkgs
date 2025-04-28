@@ -5,33 +5,29 @@
   fetchFromGitHub,
   nixosTests,
   installShellFiles,
-}:
-
-let
-  generic =
-    {
-      buildGoModule,
-      version,
-      sha256,
-      vendorHash,
-      license,
-      ...
-    }@attrs:
-    let
-      attrs' = builtins.removeAttrs attrs [
-        "buildGoModule"
-        "version"
-        "sha256"
-        "vendorHash"
-        "license"
-      ];
-    in
+}: let
+  generic = {
+    buildGoModule,
+    version,
+    sha256,
+    vendorHash,
+    license,
+    ...
+  } @ attrs: let
+    attrs' = builtins.removeAttrs attrs [
+      "buildGoModule"
+      "version"
+      "sha256"
+      "vendorHash"
+      "license"
+    ];
+  in
     buildGoModule (
       rec {
         pname = "nomad";
         inherit version vendorHash;
 
-        subPackages = [ "." ];
+        subPackages = ["."];
 
         src = fetchFromGitHub {
           owner = "hashicorp";
@@ -40,7 +36,7 @@ let
           inherit sha256;
         };
 
-        nativeBuildInputs = [ installShellFiles ];
+        nativeBuildInputs = [installShellFiles];
 
         ldflags = [
           "-X github.com/hashicorp/nomad/version.Version=${version}"
@@ -51,7 +47,7 @@ let
         # ui:
         #  Nomad release commits include the compiled version of the UI, but the file
         #  is only included if we build with the ui tag.
-        tags = [ "ui" ];
+        tags = ["ui"];
 
         postInstall = ''
           echo "complete -C $out/bin/nomad nomad" > nomad.bash
@@ -73,8 +69,7 @@ let
       }
       // attrs'
     );
-in
-rec {
+in rec {
   # Nomad never updates major go versions within a release series and is unsupported
   # on Go versions that it did not ship with. Due to historic bugs when compiled
   # with different versions we pin Go for all versions.
@@ -86,7 +81,7 @@ rec {
   nomad_1_10 = generic {
     buildGoModule = buildGo124Module;
     version = "1.10.0";
-    sha256 = "";
+    sha256 = "sha256-WtxlgmtYASDm8JjSKF+laBO53EL6ZM36ecASMXXr4p8=";
     vendorHash = "";
     license = lib.licenses.bsl11;
     passthru.tests.nomad = nixosTests.nomad;
