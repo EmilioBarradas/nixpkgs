@@ -1,44 +1,51 @@
 {
   lib,
-  agate,
   buildPythonPackage,
+  fetchPypi,
+
+  # build-system
+  hatchling,
+
+  # dependencies
+  agate,
   colorama,
   deepdiff,
-  fetchPypi,
-  hatchling,
   isodate,
   jinja2,
   jsonschema,
   mashumaro,
   pathspec,
   protobuf,
-  pytest-mock,
-  pytest-xdist,
-  pytestCheckHook,
   python-dateutil,
-  pythonOlder,
   requests,
   typing-extensions,
+
+  # tests
+  pytestCheckHook,
+  pytest-mock,
+  pytest-xdist,
 }:
 
 buildPythonPackage rec {
   pname = "dbt-common";
-  version = "1.8.0";
+  version = "1.22.0";
   pyproject = true;
 
-  disabled = pythonOlder "3.8";
-
+  # No tags on GitHub
   src = fetchPypi {
     pname = "dbt_common";
     inherit version;
-    hash = "sha256-ehZ+a3zznnWMY9NJx9LfRtkV1vHiIH0HEhsYWfMbmb4=";
+    hash = "sha256-6cdTMVCCB6SNEUsQtzKUBnKuJgwfttl7o2+zBp8Fu5g=";
   };
 
   build-system = [ hatchling ];
 
   pythonRelaxDeps = [
-    "protobuf"
     "agate"
+    "deepdiff"
+    # 0.6.x -> 0.7.2 doesn't seem too risky at a glance
+    # https://pypi.org/project/isodate/0.7.2/
+    "isodate"
   ];
 
   dependencies = [
@@ -56,14 +63,21 @@ buildPythonPackage rec {
     typing-extensions
   ] ++ mashumaro.optional-dependencies.msgpack;
 
-  # Upstream stopped to tag the source fo rnow
-  doCheck = false;
-
   nativeCheckInputs = [
-    pytest-mock
-    pytest-xdist
     pytestCheckHook
+    pytest-xdist
+    pytest-mock
   ];
+
+  disabledTests = [
+    # Assertion errors (TODO: Notify upstream)
+    "test_create_print_json"
+    "test_events"
+    "test_extra_dict_on_event"
+  ];
+
+  # No tests in the pypi archive
+  doCheck = false;
 
   pythonImportsCheck = [ "dbt_common" ];
 

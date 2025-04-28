@@ -14,13 +14,13 @@
 }:
 stdenv.mkDerivation rec {
   pname = "narsil";
-  version = "1.3.0-234-g228c4f0cb";
+  version = "1.4.0-48-gaf7c8c1b3";
 
   src = fetchFromGitHub {
     owner = "NickMcConnell";
     repo = "NarSil";
-    rev = version;
-    hash = "sha256-82ph8LTtaruaV97gdnqSQI8IfqO9wzYbR7WTGx086pQ=";
+    tag = version;
+    hash = "sha256-w/rXKD66Kx+XE1ItOwurf5XWE02OHirofVMUQqpf6WQ=";
   };
 
   passthru.updateScript = nix-update-script { };
@@ -51,7 +51,10 @@ stdenv.mkDerivation rec {
       NarSil attempts to be an almost-faithful recreation of Sil 1.3.0,
       but based on the codebase of modern Angband.
     '';
-    maintainers = with lib.maintainers; [ nanotwerp x123 ];
+    maintainers = with lib.maintainers; [
+      nanotwerp
+      x123
+    ];
     license = lib.licenses.gpl2;
   };
 }

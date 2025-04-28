@@ -12,11 +12,12 @@
   glib,
   webkitgtk_4_0,
   glib-networking,
+  override_xmx ? "1024m",
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "dbeaver-bin";
-  version = "24.2.1";
+  version = "25.0.2";
 
   src =
     let
@@ -29,10 +30,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         aarch64-darwin = "macos-aarch64.dmg";
       };
       hash = selectSystem {
-        x86_64-linux = "sha256-U1KJxE1PzRRMvYw3jSYV2n6JuhzyL30le1HeY0kft1k=";
-        aarch64-linux = "sha256-AT/Xx+Hwu64sUfR1fS9nI+RTsIfdi9udF9TR9hbjnxg=";
-        x86_64-darwin = "sha256-hCIfBv6FaNoZiTvpx1UCdwBg15vq+ZsTG5upmbWXN0M=";
-        aarch64-darwin = "sha256-g0G6fqR75AoOEzlYr6MbTBL8aQ/hWQuFyw1G2w9/JlU=";
+        x86_64-linux = "sha256-UmTy4Flxz/zIh3cLxRi7EhNDf0Ojc7fuzCbRKIE/+CQ=";
+        aarch64-linux = "sha256-I+V/2kfdxGx8zNkH98b2685IQPbVPSe9++qS4QEg0LU=";
+        x86_64-darwin = "sha256-8Qf69OHXPiqdMs//f1jbKbyKoll+oX+P+l3mpdOvraI=";
+        aarch64-darwin = "sha256-bGxn8y9hvJyqj1/i5tScufO5/ZjdlOlPChmeL+DWwoY=";
       };
     in
     fetchurl {
@@ -40,7 +41,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       inherit hash;
     };
 
-  sourceRoot = lib.optional stdenvNoCC.hostPlatform.isDarwin "dbeaver.app";
+  sourceRoot = lib.optional stdenvNoCC.hostPlatform.isDarwin "DBeaver.app";
 
   nativeBuildInputs =
     [ makeWrapper ]
@@ -53,6 +54,19 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   dontConfigure = true;
   dontBuild = true;
+
+  prePatch = ''
+    substituteInPlace ${lib.optionalString stdenvNoCC.hostPlatform.isDarwin "Contents/Eclipse/"}dbeaver.ini \
+      --replace-fail '-Xmx1024m' '-Xmx${override_xmx}'
+  '';
+
+  preInstall = ''
+    # most directories are for different architectures, only keep what we need
+    shopt -s extglob
+    pushd ${lib.optionalString stdenvNoCC.hostPlatform.isDarwin "Contents/Eclipse/"}plugins/com.sun.jna_5.15.0.v20240915-2000/com/sun/jna/
+    rm -r !(ptr|internal|linux-x86-64|linux-aarch64|darwin-x86-64|darwin-aarch64)/
+    popd
+  '';
 
   installPhase =
     if !stdenvNoCC.hostPlatform.isDarwin then
@@ -103,8 +117,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   passthru.updateScript = ./update.sh;
 
-  meta = with lib; {
+  meta = {
     homepage = "https://dbeaver.io/";
+    changelog = "https://github.com/dbeaver/dbeaver/releases/tag/${finalAttrs.version}";
     description = "Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more";
     longDescription = ''
       Free multi-platform database tool for developers, SQL programmers, database
@@ -112,10 +127,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       PostgreSQL, MariaDB, SQLite, Oracle, DB2, SQL Server, Sybase, MS Access,
       Teradata, Firebird, Derby, etc.
     '';
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    license = licenses.asl20;
-    platforms = platforms.linux ++ platforms.darwin;
-    maintainers = with maintainers; [
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    license = lib.licenses.asl20;
+    platforms = with lib.platforms; linux ++ darwin;
+    maintainers = with lib.maintainers; [
       gepbird
       mkg20001
       yzx9

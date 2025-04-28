@@ -46,7 +46,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "jupyter-book";
     repo = "jupyter-book";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-MBSf2/+4+efWHJ530jdezeh5OLTtUZlAEOl5SqoWOuE=";
   };
 
@@ -121,7 +121,7 @@ buildPythonPackage rec {
     homepage = "https://jupyterbook.org/";
     changelog = "https://github.com/jupyter-book/jupyter-book/blob/${src.rev}/CHANGELOG.md";
     license = lib.licenses.bsd3;
-    maintainers = lib.teams.jupyter.members;
+    teams = [ lib.teams.jupyter ];
     mainProgram = "jupyter-book";
   };
 }

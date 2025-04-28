@@ -2,24 +2,30 @@
   beamPackages,
   fetchFromGitHub,
   lib,
+  nix-update-script,
 }:
-beamPackages.mixRelease rec {
+let
+  inherit (beamPackages) mixRelease fetchMixDeps erlang;
+in
+mixRelease rec {
   pname = "protoc-gen-elixir";
-  version = "0.12.0";
+  version = "0.14.1";
 
   src = fetchFromGitHub {
     owner = "elixir-protobuf";
     repo = "protobuf";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-wLU3iM9jI/Zc96/HfPUjNvjteGryWos6IobIb/4zqpw=";
+    tag = "v${version}";
+    hash = "sha256-SbwjOFTyN3euMNXkuIP49zNqoXmD8611IXgqPwqfuFU=";
   };
 
-  mixFodDeps = beamPackages.fetchMixDeps {
+  mixFodDeps = fetchMixDeps {
     inherit version src;
     pname = "protoc-gen-elixir-deps";
 
-    hash = "sha256-H7yiBHoxuiqWcNbWwPU5X0Nnv8f6nM8z/ZAfZAGPZjE=";
+    hash = "sha256-T1uL3xXXmCkobJJhS3p6xMrJUyiim3AMwaG87/Ix7A8=";
   };
+
+  buildInputs = [ erlang ];
 
   postBuild = ''
     mix do escript.build
@@ -33,6 +39,8 @@ beamPackages.mixRelease rec {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "A protoc plugin to generate Elixir code";

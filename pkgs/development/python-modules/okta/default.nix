@@ -18,23 +18,26 @@
   python-jose,
   pythonOlder,
   pyyaml,
+  setuptools,
   xmltodict,
   yarl,
 }:
 
 buildPythonPackage rec {
   pname = "okta";
-  version = "2.9.8";
-  format = "setuptools";
+  version = "2.9.12";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-RDnRiPsc4p5yI9jFzOtRI+r00tvska8x4uCSjl+cWvo=";
+    hash = "sha256-pu5UEVgys6glBnWCIozj2dubQvnF75KCA6fxeujx/pA=";
   };
 
-  propagatedBuildInputs = [
+  build-system = [ setuptools ];
+
+  dependencies = [
     aenum
     aiohttp
     flatdict
@@ -66,6 +69,7 @@ buildPythonPackage rec {
     "test_update_org_contact_user"
     "test_get_role_subscription"
     "test_subscribe_unsubscribe"
+    "test_client_invalid_url"
   ];
 
   pythonImportsCheck = [

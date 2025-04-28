@@ -119,16 +119,23 @@ in
 
   # Additional packages needed as part of a fetch
   nativeBuildInputs ? [ ],
-}:
+}@args:
 
 let
   urls_ =
     if urls != [ ] && url == "" then
-      (if lib.isList urls then urls else throw "`urls` is not a list")
+      (
+        if lib.isList urls then urls else throw "`urls` is not a list: ${lib.generators.toPretty { } urls}"
+      )
     else if urls == [ ] && url != "" then
-      (if lib.isString url then [ url ] else throw "`url` is not a string")
+      (
+        if lib.isString url then
+          [ url ]
+        else
+          throw "`url` is not a string: ${lib.generators.toPretty { } urls}"
+      )
     else
-      throw "fetchurl requires either `url` or `urls` to be set";
+      throw "fetchurl requires either `url` or `urls` to be set: ${lib.generators.toPretty { } args}";
 
   hash_ =
     if
@@ -143,7 +150,7 @@ let
         ]
       ) > 1
     then
-      throw "multiple hashes passed to fetchurl"
+      throw "multiple hashes passed to fetchurl: ${lib.generators.toPretty { } urls_}"
     else
 
     if hash != "" then
@@ -155,7 +162,7 @@ let
       if outputHashAlgo != "" then
         { inherit outputHashAlgo outputHash; }
       else
-        throw "fetchurl was passed outputHash without outputHashAlgo"
+        throw "fetchurl was passed outputHash without outputHashAlgo: ${lib.generators.toPretty { } urls_}"
     else if sha512 != "" then
       {
         outputHashAlgo = "sha512";
@@ -177,7 +184,7 @@ let
         outputHash = "";
       }
     else
-      throw "fetchurl requires a hash for fixed-output derivation: ${lib.concatStringsSep ", " urls_}";
+      throw "fetchurl requires a hash for fixed-output derivation: ${lib.generators.toPretty urls_}";
 in
 
 assert
@@ -220,26 +227,20 @@ stdenvNoCC.mkDerivation (
     # New-style output content requirements.
     inherit (hash_) outputHashAlgo outputHash;
 
+    # Disable TLS verification only when we know the hash and no credentials are
+    # needed to access the resource
     SSL_CERT_FILE =
-      let
-        nixSSLCertFile = builtins.getEnv "NIX_SSL_CERT_FILE";
-      in
-      if nixSSLCertFile != "" then
-        nixSSLCertFile
-      else if
+      if
         (
           hash_.outputHash == ""
           || hash_.outputHash == lib.fakeSha256
           || hash_.outputHash == lib.fakeSha512
           || hash_.outputHash == lib.fakeHash
-          # Make sure we always enforce TLS verification when credentials
-          # are needed to access the resource
           || netrcPhase != null
         )
       then
         "${cacert}/etc/ssl/certs/ca-bundle.crt"
       else
-        # Fallback to stdenv default, see pkgs/stdenv/generic/setup.sh
         "/no-cert-file.crt";
 
     outputHashMode = if (recursiveHash || executable) then "recursive" else "flat";

@@ -11,18 +11,19 @@
   yaml-cpp,
   elfutils,
   libunwind,
+  versionCheckHook,
   enableLibcxx ? false,
   debug ? false,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "clang-uml";
-  version = "0.5.5";
+  version = "0.6.1";
 
   src = fetchFromGitHub {
     owner = "bkryza";
     repo = "clang-uml";
     rev = finalAttrs.version;
-    hash = "sha256-YzHlauVuFLT2PmfqJBNwqQ/P7d7tyl3brk7Vo/kTOF4=";
+    hash = "sha256-mY6kJnwWLgCeKXSquNTxsnr4S3bKwedgiRixzyLWTK8=";
   };
 
   nativeBuildInputs =
@@ -43,6 +44,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     "-DCUSTOM_COMPILE_OPTIONS=-Wno-error=sign-compare"
+    "-DGIT_VERSION=${finalAttrs.version}"
   ];
 
   buildInputs = [
@@ -72,6 +74,10 @@ stdenv.mkDerivation (finalAttrs: {
   dontFixup = debug;
   dontStrip = debug;
 
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  doInstallCheck = true;
+  versionCheckProgramArg = "--version";
+
   meta = {
     description = "Customizable automatic UML diagram generator for C++ based on Clang";
     longDescription = ''
@@ -84,5 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://clang-uml.github.io/";
     license = lib.licenses.asl20;
     platforms = lib.platforms.all;
+    mainProgram = "clang-uml";
   };
 })

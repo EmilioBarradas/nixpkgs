@@ -60,8 +60,6 @@ buildPythonPackage rec {
     requests
   ];
 
-  doCheck = true;
-
   nativeCheckInputs = [
     requests-mock
     stestr
@@ -80,6 +78,6 @@ buildPythonPackage rec {
     description = "Client library for OpenStack Barbican API";
     license = lib.licenses.asl20;
     mainProgram = "barbican";
-    maintainers = lib.teams.openstack.members;
+    teams = [ lib.teams.openstack ];
   };
 }

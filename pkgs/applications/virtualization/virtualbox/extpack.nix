@@ -4,17 +4,17 @@
   virtualbox,
 }:
 let
-  inherit (virtualbox) version;
+  virtualboxExtPackVersion = "7.1.6";
 in
 fetchurl rec {
-  name = "Oracle_VM_VirtualBox_Extension_Pack-${version}.vbox-extpack";
-  url = "https://download.virtualbox.org/virtualbox/${version}/${name}";
+  name = "Oracle_VirtualBox_Extension_Pack-${virtualboxExtPackVersion}.vbox-extpack";
+  url = "https://download.virtualbox.org/virtualbox/${virtualboxExtPackVersion}/${name}";
   sha256 =
     # Manually sha256sum the extensionPack file, must be hex!
     # Thus do not use `nix-prefetch-url` but instead plain old `sha256sum`.
     # Checksums can also be found at https://www.virtualbox.org/download/hashes/${version}/SHA256SUMS
     let
-      value = "d750fb17688d70e0cb2d7b06f1ad3a661303793f4d1ac39cfa9a54806b89da25";
+      value = "c13e47d3fb2c849019accb03353c7d04ffb9c264920075972ed2e2befe3cdd8b";
     in
     assert (builtins.stringLength value) == 64;
     value;

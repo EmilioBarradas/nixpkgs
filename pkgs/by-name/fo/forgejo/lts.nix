@@ -1,12 +1,10 @@
 import ./generic.nix {
-  version = "7.0.9";
-  hash = "sha256-JoHF49n2HWMHl/LMWxQlj7utkmzyZ5pHEfeSU8gjyfU=";
-  npmDepsHash = "sha256-9U2I+JzDGQlfjyvZRbfPbDMmoHxIJ/SOBhMdn1la0EI=";
-  vendorHash = "sha256-hfbNyCQMQzDzJxFc2MPAR4+v/qNcnORiQNbwbbIA4Nw=";
+  version = "11.0.0";
+  hash = "sha256-j/SmfWFfYDApqGXcH/gRF6c7gUCTkLYFTglgtdq9u/U=";
+  npmDepsHash = "sha256-laHHXq59/7+rJSYTD1Aq/AvFcio6vsnWkeV8enq3yTg=";
+  vendorHash = "sha256-REHrSuvAB5fbJ1WR+rggGZUSMy0FWnAkQQbTIqN2K2E=";
   lts = true;
   nixUpdateExtraArgs = [
-    "--version-regex"
-    "v(7\.[0-9.]+)"
     "--override-filename"
     "pkgs/by-name/fo/forgejo/lts.nix"
   ];

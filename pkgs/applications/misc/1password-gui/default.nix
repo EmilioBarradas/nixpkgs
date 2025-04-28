@@ -10,46 +10,12 @@
 
 let
   pname = "1password";
-  version = if channel == "stable" then "8.10.46" else "8.10.48-17.BETA";
 
-  sources = {
-    stable = {
-      x86_64-linux = {
-        url = "https://downloads.1password.com/linux/tar/stable/x86_64/1password-${version}.x64.tar.gz";
-        hash = "sha256-oewS90rSBqxA0V+ttcmUXznUZ3+mb5FKtmYD4kUDmTk=";
-      };
-      aarch64-linux = {
-        url = "https://downloads.1password.com/linux/tar/stable/aarch64/1password-${version}.arm64.tar.gz";
-        hash = "sha256-tHQIhLPTD2dFRK542kFnpExg36paaNuzyOED8ZKyIYk=";
-      };
-      x86_64-darwin = {
-        url = "https://downloads.1password.com/mac/1Password-${version}-x86_64.zip";
-        hash = "sha256-pnAE1UTMXX89wshEI/wzhySb1NZY5ke5bSYmUjvU/pc=";
-      };
-      aarch64-darwin = {
-        url = "https://downloads.1password.com/mac/1Password-${version}-aarch64.zip";
-        hash = "sha256-MmHUa96keBV9+E2GQdgz/aCTXeFkVNqHV0eH8/WhvhY=";
-      };
-    };
-    beta = {
-      x86_64-linux = {
-        url = "https://downloads.1password.com/linux/tar/beta/x86_64/1password-${version}.x64.tar.gz";
-        hash = "sha256-4SPZJP/ebnyAMEWrIGonb+5nYXuM8KCPK9modC/Cr/Y=";
-      };
-      aarch64-linux = {
-        url = "https://downloads.1password.com/linux/tar/beta/aarch64/1password-${version}.arm64.tar.gz";
-        hash = "sha256-V5Nt81Trw6l7DAUtCX2Yv/fL2wBJpJER0iaOBmMfQ5o=";
-      };
-      x86_64-darwin = {
-        url = "https://downloads.1password.com/mac/1Password-${version}-x86_64.zip";
-        hash = "sha256-UfSUPqZgbYdWyrfw41SdnnI1IeA+dYsfBAu/UQl0vVI=";
-      };
-      aarch64-darwin = {
-        url = "https://downloads.1password.com/mac/1Password-${version}-aarch64.zip";
-        hash = "sha256-ynkDnJtoKMAtegeilB0XIH+YrSS9EKYV1ceN0Ecls+A=";
-      };
-    };
-  };
+  versions = builtins.fromJSON (builtins.readFile ./versions.json);
+  hostOs = if stdenv.hostPlatform.isLinux then "linux" else "darwin";
+  version = versions."${channel}-${hostOs}" or (throw "unknown channel-os ${channel}-${hostOs}");
+
+  sources = builtins.fromJSON (builtins.readFile ./sources.json);
 
   src = fetchurl {
     inherit
@@ -67,9 +33,11 @@ let
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = lib.licenses.unfree;
     maintainers = with lib.maintainers; [
+      khaneliman
       timstott
       savannidgerinel
       sebtm
+      bdd
     ];
     platforms = builtins.attrNames sources.${channel};
     mainProgram = "1password";

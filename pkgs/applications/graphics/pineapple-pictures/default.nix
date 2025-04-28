@@ -1,23 +1,23 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, qtsvg
-, qtwayland
-, qttools
-, exiv2
-, wrapQtAppsHook
-, cmake
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  qtsvg,
+  qttools,
+  exiv2,
+  wrapQtAppsHook,
+  cmake,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pineapple-pictures";
-  version = "0.8.1";
+  version = "0.9.2";
 
   src = fetchFromGitHub {
     owner = "BLumia";
     repo = "pineapple-pictures";
     rev = finalAttrs.version;
-    hash = "sha256-7X0A3tjdr8hnnovkbgIOLx5h/eWy0gkM8SEB2/bpwkQ=";
+    hash = "sha256-NWh0+DEfKT1iZY6tXVGuxgaXF5U+UB9S5BlWyD+1Bko=";
   };
 
   nativeBuildInputs = [
@@ -28,7 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     qtsvg
-    qtwayland
     exiv2
   ];
 

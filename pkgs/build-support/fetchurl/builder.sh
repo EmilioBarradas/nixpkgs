@@ -1,6 +1,3 @@
-if [ -e "$NIX_ATTRS_SH_FILE" ]; then . "$NIX_ATTRS_SH_FILE"; elif [ -f .attrs.sh ]; then . .attrs.sh; fi
-source $stdenv/setup
-
 source $mirrorsFile
 
 curlVersion=$(curl -V | head -1 | cut -d' ' -f2)
@@ -14,13 +11,14 @@ curl=(
     --location
     --max-redirs 20
     --retry 3
+    --retry-all-errors
+    --continue-at -
     --disable-epsv
     --cookie-jar cookies
     --user-agent "curl/$curlVersion Nixpkgs/$nixpkgsVersion"
 )
 
-# Default fallback value defined in pkgs/build-support/fetchurl/default.nix
-if [ "$SSL_CERT_FILE" == "/no-cert-file.crt" ]; then
+if ! [ -f "$SSL_CERT_FILE" ]; then
     curl+=(--insecure)
 fi
 

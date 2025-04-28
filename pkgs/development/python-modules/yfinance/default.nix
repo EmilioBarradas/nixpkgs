@@ -23,7 +23,7 @@
 
 buildPythonPackage rec {
   pname = "yfinance";
-  version = "0.2.44";
+  version = "0.2.56";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -31,8 +31,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "ranaroussi";
     repo = "yfinance";
-    rev = "refs/tags/${version}";
-    hash = "sha256-XaenqZMvbimuptfCpvyhXxvbJTPA94+nN938HI5gDQo=";
+    tag = version;
+    hash = "sha256-Y+tFlkBn+MJxmohbP9bRxPXC4OTt3GvTpozguOZJ5EQ=";
   };
 
   build-system = [ setuptools ];
@@ -70,7 +70,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Module to doiwnload Yahoo! Finance market data";
     homepage = "https://github.com/ranaroussi/yfinance";
-    changelog = "https://github.com/ranaroussi/yfinance/blob/${version}/CHANGELOG.rst";
+    changelog = "https://github.com/ranaroussi/yfinance/blob/${src.tag}/CHANGELOG.rst";
     license = licenses.asl20;
     maintainers = with maintainers; [ drewrisinger ];
   };
