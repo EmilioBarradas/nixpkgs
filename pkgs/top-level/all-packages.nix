@@ -3012,6 +3012,7 @@ with pkgs;
     godot
     godot-mono
     godot-export-templates-bin
+    godot-kotlin-jvm
     ;
 
   goattracker = callPackage ../applications/audio/goattracker { };

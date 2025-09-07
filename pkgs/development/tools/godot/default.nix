@@ -74,4 +74,6 @@ rec {
   godot = godotPackages.godot;
   godot-mono = godotPackages.godot-mono;
   godot-export-templates-bin = godotPackages.export-templates-bin;
+
+  godot-kotlin-jvm = callPackage ./kotlin-jvm.nix { };
 }
