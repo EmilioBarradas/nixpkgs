@@ -108,9 +108,7 @@ The *priority* of the package, used by `nix-env` to resolve file name conflicts 
 The list of Nix platform types on which the package is supported. Hydra builds packages according to the platform specified. If no platform is specified, the package does not have prebuilt binaries. An example is:
 
 ```nix
-{
-  meta.platforms = lib.platforms.linux;
-}
+{ meta.platforms = lib.platforms.linux; }
 ```
 
 Attribute Set `lib.platforms` defines [various common lists](https://github.com/NixOS/nixpkgs/blob/master/lib/systems/doubles.nix) of platforms types.
@@ -164,9 +162,7 @@ This means that `broken` can be used to express constraints, for example:
 - Does not cross compile
 
   ```nix
-  {
-    meta.broken = !(stdenv.buildPlatform.canExecute stdenv.hostPlatform);
-  }
+  { meta.broken = !(stdenv.buildPlatform.canExecute stdenv.hostPlatform); }
   ```
 
 - Broken if all of a certain set of its dependencies are broken
@@ -184,6 +180,22 @@ This means that `broken` can be used to express constraints, for example:
 
 This makes `broken` strictly more powerful than `meta.badPlatforms`.
 However `meta.availableOn` currently examines only `meta.platforms` and `meta.badPlatforms`, so `meta.broken` does not influence the default values for optional dependencies.
+
+## `knownVulnerabilities` {#var-meta-knownVulnerabilities}
+
+A list of known vulnerabilities affecting the package, usually identified by CVE identifiers.
+
+This metadata allows users and tools to be aware of unresolved security issues before using the package, for example:
+
+```nix
+{
+  meta.knownVulnerabilities = [
+    "CVE-2024-3094: Malicious backdoor allowing unauthorized remote code execution"
+  ];
+}
+```
+
+If this list is not empty, the package is marked as "insecure", meaning that it cannot be built or installed unless the environment variable [`NIXPKGS_ALLOW_INSECURE`](#sec-allow-insecure) is set.
 
 ## Licenses {#sec-meta-license}
 

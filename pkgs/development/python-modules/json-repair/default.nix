@@ -8,14 +8,14 @@
 
 buildPythonPackage rec {
   pname = "json-repair";
-  version = "0.42.0";
+  version = "0.50.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mangiucugna";
     repo = "json_repair";
     tag = "v${version}";
-    hash = "sha256-gWZmDljbV1CbVjBDqImvhF2LF0uhqsiZ5mF3fuGf6HQ=";
+    hash = "sha256-QiM5EVIJtnS4jE8aIm3dDi2LrF+eb2PoP02Qc/1tzzk=";
   };
 
   build-system = [ setuptools ];
@@ -24,7 +24,6 @@ buildPythonPackage rec {
 
   disabledTestPaths = [
     "tests/test_performance.py"
-    "tests/test_coverage.py"
   ];
 
   pythonImportsCheck = [ "json_repair" ];

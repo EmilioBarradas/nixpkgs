@@ -11,7 +11,7 @@
 
 buildPythonPackage rec {
   pname = "plaid-python";
-  version = "30.0.0";
+  version = "36.1.0";
   pyproject = true;
 
   disabled = pythonOlder "3.6";
@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchPypi {
     pname = "plaid_python";
     inherit version;
-    hash = "sha256-qCaXtvLceFg5njbKbqPVHW81HniGswB4HIdWU51/4X4=";
+    hash = "sha256-3TQ6jGsf+2ebYnAxRTKs4JrijDf3ojyfS4iBAMAG8FU=";
   };
 
   build-system = [ setuptools ];

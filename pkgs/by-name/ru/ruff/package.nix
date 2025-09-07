@@ -16,17 +16,39 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "ruff";
-  version = "0.11.7";
+  version = "0.12.8";
 
   src = fetchFromGitHub {
     owner = "astral-sh";
     repo = "ruff";
     tag = finalAttrs.version;
-    hash = "sha256-DXu9/DRwcffZtsql/Qk+6GyzhiYXUyW6R9FCAvLhn6o=";
+    hash = "sha256-ypYtAUQBFSf+cgly9K5eRMegtWrRmLmqrgfRmCJvXEk=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-4TK7HEdSCvUGqsAH+dnPgMBYmT/0mOnvQXHr/PtcsT0=";
+  # Patch out test that fails due to ANSI escape codes being written as-is,
+  # causing a snapshot test to fail. The output itself is correct.
+  #
+  # This is the relevant test's output as of 0.12.5
+  # >     0       │-/home/ferris/project/code.py:1:1: E902 Permission denied (os error 13)
+  # >     1       │-/home/ferris/project/notebook.ipynb:1:1: E902 Permission denied (os error 13)
+  # >     2       │-/home/ferris/project/pyproject.toml:1:1: E902 Permission denied (os error 13)
+  # >           0 │+␛[1m/home/ferris/project/code.py␛[0m␛[36m:␛[0m1␛[36m:␛[0m1␛[36m:␛[0m ␛[1m␛[31mE902␛[0m Permission denied (os error 13)
+  # >           1 │+␛[1m/home/ferris/project/notebook.ipynb␛[0m␛[36m:␛[0m1␛[36m:␛[0m1␛[36m:␛[0m ␛[1m␛[31mE902␛[0m Permission denied (os error 13)
+  # >           2 │+␛[1m/home/ferris/project/pyproject.toml␛[0m␛[36m:␛[0m1␛[36m:␛[0m1␛[36m:␛[0m ␛[1m␛[31mE902␛[0m Permission denied (os error 13)
+  # > ────────────┴───────────────────────────────────────────────────────────────────
+  postPatch = ''
+    substituteInPlace crates/ruff/src/commands/check.rs --replace-fail '
+        #[test]
+        fn unreadable_files() -> Result<()> {' \
+    '
+        #[test]
+        #[ignore = "ANSI Escape Codes trigger snapshot diff"]
+        fn unreadable_files() -> Result<()> {'
+  '';
+
+  cargoBuildFlags = [ "--package=ruff" ];
+
+  cargoHash = "sha256-0iYwS8Ssi4JDxwr0Q2+iKvYHb179L6BiiuXa2D4qiOA=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -54,12 +76,21 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # This causes errors like "error: linker `cc` not found" on static builds
   doCheck = !stdenv.hostPlatform.isStatic;
 
-  # Failing on darwin for an unclear reason, but probably due to sandbox.
-  # According to the maintainers, those tests are from an experimental crate that isn't actually
-  # used by ruff currently and can thus be safely skipped.
-  cargoTestFlags = lib.optionals stdenv.hostPlatform.isDarwin [
+  # Exclude tests from `ty`-related crates, run everything else.
+  # Ordinarily we would run all the tests, but there is significant overlap with the `ty` package in nixpkgs,
+  # which ruff shares a monorepo with.
+  # As such, we leave running `ty` tests to the `ty` package, and concentrate on everything else.
+  cargoTestFlags = [
     "--workspace"
-    "--exclude=red_knot"
+    "--exclude=ty"
+    "--exclude=ty_ide"
+    "--exclude=ty_project"
+    "--exclude=ty_python_semantic"
+    "--exclude=ty_server"
+    "--exclude=ty_static"
+    "--exclude=ty_test"
+    "--exclude=ty_vendored"
+    "--exclude=ty_wasm"
   ];
 
   nativeInstallCheckInputs = [
@@ -72,6 +103,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     tests = lib.optionalAttrs stdenv.hostPlatform.isLinux {
       nixos-test-driver-busybox = nixosTests.nixos-test-driver.busybox;
     };
+    # Updating `ruff` needs to be done on staging due to NixOS tests. Disabling r-ryantm update bot:
+    # nixpkgs-update: no auto update
     updateScript = nix-update-script { };
   };
 
@@ -82,6 +115,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     license = lib.licenses.mit;
     mainProgram = "ruff";
     maintainers = with lib.maintainers; [
+      bengsparks
       figsoda
       GaetanLepage
     ];

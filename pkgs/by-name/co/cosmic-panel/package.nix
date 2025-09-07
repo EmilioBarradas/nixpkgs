@@ -13,6 +13,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-panel";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-panel";
@@ -20,7 +21,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     hash = "sha256-QcrkfU6HNZ2tWfKsMdcv58HC/PE7b4T14AIep85TWOY=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-qufOJeWPRjj4GgWNJmQfYaGKeYOQbkTeFzrUSi9QNnQ=";
 
   nativeBuildInputs = [

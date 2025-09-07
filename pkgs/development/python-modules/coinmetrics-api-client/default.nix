@@ -18,7 +18,7 @@
 
 buildPythonPackage rec {
   pname = "coinmetrics-api-client";
-  version = "2025.4.15.13";
+  version = "2025.8.15.15";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -28,7 +28,7 @@ buildPythonPackage rec {
   src = fetchPypi {
     inherit version;
     pname = "coinmetrics_api_client";
-    hash = "sha256-Wyst1/7CN4ZfkzvAkoUSDlSNECgwlx+11yQEzfddcJQ=";
+    hash = "sha256-vk+L6PXygyI0UlO5l3xhw7Gcp5qi6sTH3TFdFAkQGZA=";
   };
 
   pythonRelaxDeps = [ "typer" ];
@@ -52,7 +52,8 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pytestCheckHook
     pytest-mock
-  ] ++ lib.flatten (builtins.attrValues optional-dependencies);
+  ]
+  ++ lib.flatten (builtins.attrValues optional-dependencies);
 
   pythonImportsCheck = [ "coinmetrics.api_client" ];
 

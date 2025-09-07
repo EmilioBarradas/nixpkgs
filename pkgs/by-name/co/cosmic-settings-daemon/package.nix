@@ -17,6 +17,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-settings-daemon";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-settings-daemon";
@@ -31,7 +32,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '/usr/share/themes/adw-gtk3' '${adw-gtk3}/share/themes/adw-gtk3'
   '';
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-Dzv1SDeZFIa+LFQQ91lO7RBHldsjDnGf+R12Ln2WZwU=";
 
   nativeBuildInputs = [ pkg-config ];

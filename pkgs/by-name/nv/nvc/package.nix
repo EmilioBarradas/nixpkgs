@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchpatch2,
   autoreconfHook,
   check,
   flex,
@@ -16,13 +17,13 @@
 
 stdenv.mkDerivation rec {
   pname = "nvc";
-  version = "1.16.0";
+  version = "1.17.2";
 
   src = fetchFromGitHub {
     owner = "nickg";
     repo = "nvc";
-    rev = "r${version}";
-    hash = "sha256-RI86VdWuPTcjkQstwDBN/rDLv/Imy9kYH/nIJSGuIcI=";
+    tag = "r${version}";
+    hash = "sha256-YNbRgqJSf22YV/4e2Sr9CwKFOQcBVhS6ScDNon3yJUM=";
   };
 
   nativeBuildInputs = [
@@ -33,16 +34,15 @@ stdenv.mkDerivation rec {
     which
   ];
 
-  buildInputs =
-    [
-      libffi
-      llvm
-      zlib
-      zstd
-    ]
-    ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
-      elfutils
-    ];
+  buildInputs = [
+    libffi
+    llvm
+    zlib
+    zstd
+  ]
+  ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
+    elfutils
+  ];
 
   preConfigure = ''
     mkdir build

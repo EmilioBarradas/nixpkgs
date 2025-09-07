@@ -16,6 +16,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-workspaces-epoch";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-workspaces-epoch";
@@ -23,7 +24,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     hash = "sha256-d7KYZbq8O/t5V/gU+wwstp06vyfnmt6vRKo+54Dct+o=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-TjgnPuFUIDtxx9kpvN9hKiir3/ZVtCc0z1CE4UHre1Q=";
 
   separateDebugInfo = true;

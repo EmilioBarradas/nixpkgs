@@ -3,7 +3,6 @@
   fetchFromGitHub,
   lib,
   rustPlatform,
-  darwin,
   udev,
   protobuf,
   rocksdb_8_3,
@@ -13,42 +12,33 @@
   nix-update-script,
   versionCheckHook,
   # Taken from https://github.com/solana-labs/solana/blob/master/scripts/cargo-install-all.sh#L84
-  solanaPkgs ?
-    [
-      "cargo-build-bpf"
-      "cargo-test-bpf"
-      "cargo-build-sbf"
-      "cargo-test-sbf"
-      "solana"
-      "solana-bench-tps"
-      "solana-faucet"
-      "solana-gossip"
-      "solana-install"
-      "solana-keygen"
-      "solana-ledger-tool"
-      "solana-log-analyzer"
-      "solana-net-shaper"
-      "solana-validator"
-      "solana-test-validator"
-    ]
-    ++ [
-      # XXX: Ensure `solana-genesis` is built LAST!
-      # See https://github.com/solana-labs/solana/issues/5826
-      "solana-genesis"
-    ],
+  solanaPkgs ? [
+    "cargo-build-bpf"
+    "cargo-test-bpf"
+    "cargo-build-sbf"
+    "cargo-test-sbf"
+    "solana"
+    "solana-bench-tps"
+    "solana-faucet"
+    "solana-gossip"
+    "solana-install"
+    "solana-keygen"
+    "solana-ledger-tool"
+    "solana-log-analyzer"
+    "solana-net-shaper"
+    "solana-validator"
+    "solana-test-validator"
+  ]
+  ++ [
+    # XXX: Ensure `solana-genesis` is built LAST!
+    # See https://github.com/solana-labs/solana/issues/5826
+    "solana-genesis"
+  ],
 }:
 let
   version = "1.18.26";
   hash = "sha256-sJ0Zn5GMi64/S8zqomL/dYRVW8SOQWsP+bpcdatJC0A=";
   rocksdb = rocksdb_8_3;
-
-  inherit (darwin.apple_sdk_11_0) Libsystem;
-  inherit (darwin.apple_sdk_11_0.frameworks)
-    System
-    IOKit
-    AppKit
-    Security
-    ;
 in
 rustPlatform.buildRustPackage rec {
   pname = "solana-cli";
@@ -74,7 +64,6 @@ rustPlatform.buildRustPackage rec {
   cargoPatches = [ ./crossbeam-epoch.patch ];
 
   cargoHash = "sha256-adzcLrOiUUYhz57gme/hEmD4E3kVcKCp0/jSoavZfjw=";
-  useFetchCargoVendor = true;
 
   strictDeps = true;
   cargoBuildFlags = builtins.map (n: "--bin=${n}") solanaPkgs;
@@ -91,19 +80,11 @@ rustPlatform.buildRustPackage rec {
     protobuf
     pkg-config
   ];
-  buildInputs =
-    [
-      openssl
-      rustPlatform.bindgenHook
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [ udev ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      IOKit
-      Security
-      AppKit
-      System
-      Libsystem
-    ];
+  buildInputs = [
+    openssl
+    rustPlatform.bindgenHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ udev ];
 
   doInstallCheck = true;
 

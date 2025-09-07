@@ -6,39 +6,31 @@
   libgit2,
   openssl,
   zlib,
-  stdenv,
-  darwin,
   git,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "gitu";
-  version = "0.30.3";
+  version = "0.35.0";
 
   src = fetchFromGitHub {
     owner = "altsem";
     repo = "gitu";
     rev = "v${version}";
-    hash = "sha256-WXz8H68EpvkUEpdEbdukggbjFXUPA+FRcZTsk48W6TU=";
+    hash = "sha256-hN7Dj31t1Kh9m4Ou/yBALqEKVlKB0++Qu1H5UEiIUzs=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-0+KHO7CGYdifQGbtywuK5xQmS2BuxFX50eMGpo5RRYU=";
+  cargoHash = "sha256-gMSEaXoHK6hrZ2zrHOZkRgve66Zg1gshB3KqUjfxtnI=";
 
   nativeBuildInputs = [
     pkg-config
   ];
 
-  buildInputs =
-    [
-      libgit2
-      openssl
-      zlib
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      darwin.apple_sdk.frameworks.AppKit
-      darwin.apple_sdk.frameworks.Security
-    ];
+  buildInputs = [
+    libgit2
+    openssl
+    zlib
+  ];
 
   nativeCheckInputs = [
     git

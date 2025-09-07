@@ -14,6 +14,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-osd";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-osd";
@@ -26,7 +27,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga' '${sound-theme-freedesktop}/share/sounds/freedesktop/stereo/audio-volume-change.oga'
   '';
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-kfExKggQo3MoTXw1JbKWjLu5kwYF0n7DzSQcG6e1+QQ=";
 
   nativeBuildInputs = [ libcosmicAppHook ];

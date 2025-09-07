@@ -10,8 +10,8 @@ vscode-utils.buildVscodeMarketplaceExtension {
   mktplcRef = {
     publisher = "ms-azuretools";
     name = "vscode-bicep";
-    version = "0.34.44";
-    hash = "sha256-y+FdlnJeYBpu30s5g+39HczVN5ncaacHvybYLVebH34=";
+    version = "0.37.4";
+    hash = "sha256-RBoScMaYWKfA9SONCLkFEcGwj8ffQ3ZlAOiyQY9LtVw=";
   };
 
   buildInputs = [

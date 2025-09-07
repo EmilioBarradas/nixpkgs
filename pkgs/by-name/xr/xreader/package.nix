@@ -36,13 +36,13 @@
 
 stdenv.mkDerivation rec {
   pname = "xreader";
-  version = "4.2.5";
+  version = "4.4.0";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
-    repo = pname;
+    repo = "xreader";
     rev = version;
-    hash = "sha256-4riTLU8ElWxxnigNAhmAv+7m1fNneDLCgS2Tj1V0UNk=";
+    hash = "sha256-56G+UmYTNEp9lMU56Nm+OIuPwXwhDt92ANkaC0NWZZQ=";
   };
 
   nativeBuildInputs = [
@@ -58,7 +58,8 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "-Dmathjax-directory=${nodePackages.mathjax}"
     "-Dintrospection=true"
-  ] ++ (map (x: "-D${x}=true") backends);
+  ]
+  ++ (map (x: "-D${x}=true") backends);
 
   buildInputs = [
     glib

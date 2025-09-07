@@ -12,6 +12,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-screenshot";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-screenshot";
@@ -19,7 +20,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     hash = "sha256-VvU/9vYdoTvy3yzdeXrhKrtS9tUHMKnaSAeNTEKk5PA=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-1r0Uwcf4kpHCgWqrUYZELsVXGDzbtbmu/WFeX53fBiQ=";
 
   nativeBuildInputs = [

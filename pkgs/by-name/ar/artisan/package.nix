@@ -2,14 +2,15 @@
   lib,
   appimageTools,
   fetchurl,
+  nix-update-script,
 }:
 let
   pname = "artisan";
-  version = "3.1.0";
+  version = "3.2.0";
 
   src = fetchurl {
     url = "https://github.com/artisan-roaster-scope/artisan/releases/download/v${version}/${pname}-linux-${version}.AppImage";
-    hash = "sha256-PkrqX2CflSCR1e+4Y4K12iuCrYqDMecD1vf8GKz1StQ=";
+    hash = "sha256-p8M9Z0z/0unJPOLXVOnN8INO4v0D5Ojjug42xT77oqQ=";
   };
 
   appimageContents = appimageTools.extract {
@@ -24,8 +25,12 @@ appimageTools.wrapType2 {
     install -m 444 -D ${appimageContents}/artisan.png $out/share/applications/artisan.png
   '';
 
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version-regex=v([\\d.]+)" ];
+  };
+
   meta = {
-    description = "visual scope for coffee roasters";
+    description = "Visual scope for coffee roasters";
     homepage = "https://artisan-scope.org/";
     changelog = "https://github.com/artisan-roaster-scope/artisan/releases/tag/v${version}";
     downloadPage = "https://github.com/artisan-roaster-scope/artisan/releases";

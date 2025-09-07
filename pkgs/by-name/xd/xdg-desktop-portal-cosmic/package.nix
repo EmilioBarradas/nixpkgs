@@ -19,6 +19,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "xdg-desktop-portal-cosmic";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "xdg-desktop-portal-cosmic";
@@ -31,7 +32,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     VERGEN_GIT_SHA = finalAttrs.src.tag;
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-fOaLeWtrjgBDSShC5OmBZKODNQn4bp/+iPZX5ZMQFqk=";
 
   separateDebugInfo = true;

@@ -9,14 +9,14 @@
 
 buildGoModule rec {
   pname = "museum";
-  version = "1.0.2";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "ente-io";
     repo = "ente";
     sparseCheckout = [ "server" ];
-    rev = "photos-v${version}";
-    hash = "sha256-d66dCTs68sIL6iCV4vDvErER3LAz/SdkqOj0aJBro8k=";
+    tag = "photos-v${version}";
+    hash = "sha256-/TxQKwQ604zsQ+31SZR/WWKBDiR3taGs2wi9oFOENVA=";
   };
 
   vendorHash = "sha256-px4pMqeH73Fe06va4+n6hklIUDMbPmAQNKKRIhwv6ec=";
@@ -38,6 +38,7 @@ buildGoModule rec {
     cp -R configurations \
       migrations \
       mail-templates \
+      web-templates \
       $out/share/museum
   '';
 

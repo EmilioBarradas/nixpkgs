@@ -6,7 +6,7 @@
 
 stdenv.mkDerivation rec {
   pname = "vault-bin";
-  version = "1.19.2";
+  version = "1.20.3";
 
   src =
     let
@@ -20,11 +20,11 @@ stdenv.mkDerivation rec {
         aarch64-darwin = "darwin_arm64";
       };
       hash = selectSystem {
-        x86_64-linux = "sha256-11c1zmYHjefDX2bRXfFSzwzhOtAO4hbrbL9bTeAkvDM=";
-        aarch64-linux = "sha256-Y5KKw6IMNM9Zix98mRy4HNKBchGrQ3hLhWIlVZwNsK4=";
-        i686-linux = "sha256-iFldcD9Tr2oV//PhT3uvG9+xck5c5GWstbVobkyck8U=";
-        x86_64-darwin = "sha256-Z678lFCTXmbX4Dtsbrp9pwwP9Qfok01nHpet9yTbn8c=";
-        aarch64-darwin = "sha256-uKQHSekbuluRTrwWItQkAJFydsBolmLzCBQ9gMpDbt8=";
+        x86_64-linux = "sha256-3IE0WJ3JmzeUwC6OcorebHOD858SKiBR2Rv6KhKewXU=";
+        aarch64-linux = "sha256-DsqOf3yeOz3SI+CCvS2KcCJ6k18o4H+LI1Z39i9ezb0=";
+        i686-linux = "sha256-ONrB+Gwm0dMAK8lvCg5ljC2KApkugA8zX9HcmV0QzFM=";
+        x86_64-darwin = "sha256-cbxdyuLhc8+Ux2ZOX1zncsP2KGqWruuno/Yzct/cyII=";
+        aarch64-darwin = "sha256-zWuI+KFNyqoxnEKI25N4igXnXjoz+AXMU1WgGDKyfog=";
       };
     in
     fetchzip {

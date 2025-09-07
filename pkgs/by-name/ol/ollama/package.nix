@@ -14,11 +14,11 @@
   clblast,
   libdrm,
   rocmPackages,
-  rocmGpuTargets ? rocmPackages.clr.gpuTargets or [ ],
+  rocmGpuTargets ? rocmPackages.clr.localGpuTargets or (rocmPackages.clr.gpuTargets or [ ]),
   cudaPackages,
-  cudaArches ? cudaPackages.cudaFlags.realArches or [ ],
-  darwin,
+  cudaArches ? cudaPackages.flags.realArches or [ ],
   autoAddDriverRunpath,
+  apple-sdk_15,
 
   # passthru
   nixosTests,
@@ -89,28 +89,20 @@ let
 
   cudaPath = lib.removeSuffix "-${cudaMajorVersion}" cudaToolkit;
 
-  metalFrameworks = with darwin.apple_sdk_11_0.frameworks; [
-    Accelerate
-    Metal
-    MetalKit
-    MetalPerformanceShaders
+  wrapperOptions = [
+    # ollama embeds llama-cpp binaries which actually run the ai models
+    # these llama-cpp binaries are unaffected by the ollama binary's DT_RUNPATH
+    # LD_LIBRARY_PATH is temporarily required to use the gpu
+    # until these llama-cpp binaries can have their runpath patched
+    "--suffix LD_LIBRARY_PATH : '${addDriverRunpath.driverLink}/lib'"
+  ]
+  ++ lib.optionals enableRocm [
+    "--suffix LD_LIBRARY_PATH : '${rocmPath}/lib'"
+    "--set-default HIP_PATH '${rocmPath}'"
+  ]
+  ++ lib.optionals enableCuda [
+    "--suffix LD_LIBRARY_PATH : '${lib.makeLibraryPath (map lib.getLib cudaLibs)}'"
   ];
-
-  wrapperOptions =
-    [
-      # ollama embeds llama-cpp binaries which actually run the ai models
-      # these llama-cpp binaries are unaffected by the ollama binary's DT_RUNPATH
-      # LD_LIBRARY_PATH is temporarily required to use the gpu
-      # until these llama-cpp binaries can have their runpath patched
-      "--suffix LD_LIBRARY_PATH : '${addDriverRunpath.driverLink}/lib'"
-    ]
-    ++ lib.optionals enableRocm [
-      "--suffix LD_LIBRARY_PATH : '${rocmPath}/lib'"
-      "--set-default HIP_PATH '${rocmPath}'"
-    ]
-    ++ lib.optionals enableCuda [
-      "--suffix LD_LIBRARY_PATH : '${lib.makeLibraryPath (map lib.getLib cudaLibs)}'"
-    ];
   wrapperArgs = builtins.concatStringsSep " " wrapperOptions;
 
   goBuild =
@@ -125,17 +117,16 @@ in
 goBuild (finalAttrs: {
   pname = "ollama";
   # don't forget to invalidate all hashes each update
-  version = "0.6.6";
+  version = "0.11.7";
 
   src = fetchFromGitHub {
     owner = "ollama";
     repo = "ollama";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-9ZkO+LrS9rOTgOW8chLO3tnbne/+BSxQY+zOsSoE5Zc=";
-    fetchSubmodules = true;
+    hash = "sha256-rSKuLdfbmAyGTkhfdE9GuywuQweeA5WfNwP/wGMN4So=";
   };
 
-  vendorHash = "sha256-4wYgtdCHvz+ENNMiHptu6ulPJAznkWetQcdba3IEB6s=";
+  vendorHash = "sha256-SlaDsu001TUW+t9WRp7LqxUSQSGDF1Lqu9M1bgILoX4=";
 
   env =
     lib.optionalAttrs enableRocm {
@@ -145,34 +136,26 @@ goBuild (finalAttrs: {
       CFLAGS = "-Wno-c++17-extensions -I${rocmPath}/include";
       CXXFLAGS = "-Wno-c++17-extensions -I${rocmPath}/include";
     }
-    // lib.optionalAttrs (enableRocm && (rocmPackages.clr.localGpuTargets or false)) {
-
-      # If rocm CLR is set to build for an exact set of targets reuse that target list,
-      # otherwise let ollama use its builtin defaults
-      HIP_ARCHS = lib.concatStringsSep ";" rocmPackages.clr.localGpuTargets;
-    }
     // lib.optionalAttrs enableCuda { CUDA_PATH = cudaPath; };
 
-  nativeBuildInputs =
-    [
-      cmake
-      gitMinimal
-    ]
-    ++ lib.optionals enableRocm [
-      rocmPackages.llvm.bintools
-      rocmLibs
-    ]
-    ++ lib.optionals enableCuda [ cudaPackages.cuda_nvcc ]
-    ++ lib.optionals (enableRocm || enableCuda) [
-      makeWrapper
-      autoAddDriverRunpath
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin metalFrameworks;
+  nativeBuildInputs = [
+    cmake
+    gitMinimal
+  ]
+  ++ lib.optionals enableRocm [
+    rocmPackages.llvm.bintools
+    rocmLibs
+  ]
+  ++ lib.optionals enableCuda [ cudaPackages.cuda_nvcc ]
+  ++ lib.optionals (enableRocm || enableCuda) [
+    makeWrapper
+    autoAddDriverRunpath
+  ];
 
   buildInputs =
     lib.optionals enableRocm (rocmLibs ++ [ libdrm ])
     ++ lib.optionals enableCuda cudaLibs
-    ++ lib.optionals stdenv.hostPlatform.isDarwin metalFrameworks;
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [ apple-sdk_15 ];
 
   # replace inaccurate version number with actual release version
   postPatch = ''
@@ -246,21 +229,21 @@ goBuild (finalAttrs: {
   '';
 
   passthru = {
-    tests =
-      {
-        inherit ollama;
-        version = testers.testVersion {
-          inherit (finalAttrs) version;
-          package = ollama;
-        };
-      }
-      // lib.optionalAttrs stdenv.hostPlatform.isLinux {
-        inherit ollama-rocm ollama-cuda;
-        service = nixosTests.ollama;
-        service-cuda = nixosTests.ollama-cuda;
-        service-rocm = nixosTests.ollama-rocm;
+    tests = {
+      inherit ollama;
+      version = testers.testVersion {
+        inherit (finalAttrs) version;
+        package = ollama;
       };
-  } // lib.optionalAttrs (!enableRocm && !enableCuda) { updateScript = nix-update-script { }; };
+    }
+    // lib.optionalAttrs stdenv.hostPlatform.isLinux {
+      inherit ollama-rocm ollama-cuda;
+      service = nixosTests.ollama;
+      service-cuda = nixosTests.ollama-cuda;
+      service-rocm = nixosTests.ollama-rocm;
+    };
+  }
+  // lib.optionalAttrs (!enableRocm && !enableCuda) { updateScript = nix-update-script { }; };
 
   meta = {
     description =
@@ -275,7 +258,6 @@ goBuild (finalAttrs: {
     maintainers = with maintainers; [
       abysssol
       dit7ya
-      elohmeier
       prusnak
     ];
   };

@@ -6,25 +6,35 @@
   file,
   libnsl,
   writableTmpDirAsHomeHook,
+  nix-update-script,
 }:
 
-stdenv.mkDerivation (finalAttr: {
+stdenv.mkDerivation {
   pname = "re-Isearch";
-  version = "2.20220925.4.0a-unstable-2025-03-16";
+  version = "2.20220925.4.0a-unstable-2025-05-15";
 
   src = fetchFromGitHub {
     owner = "re-Isearch";
     repo = "re-Isearch";
-    rev = "56e0dfbe7468881b3958ca8e630f41a5354e9873";
-    sha256 = "sha256-tI75D02/sFEkHDQX/BpDlu24WNP6Qh9G0MIfEvs8npM=";
+    rev = "35e939fd60948f112b668b06d2b8b75f2c7425d3";
+    hash = "sha256-r7KUwx2SrfnpSknGSpzw33Qwp63htoKknrnmdOgA/9Y=";
   };
 
-  # Upstream issue: https://github.com/re-Isearch/re-Isearch/issues/11
-  patches = [ ./0001-fix-JsonHitTable-undefined-reference.patch ];
+  patches = [
+    # https://github.com/re-Isearch/re-Isearch/pull/12
+    ./1001-Fix-resurcive-make-parallelism.patch
+  ];
 
   postPatch = ''
     # Fix gcc-13 build due to missing <cstdint> include.
+    # https://github.com/re-Isearch/re-Isearch/pull/13
     sed -e '1i #include <cstdint>' -i src/mmap.cxx
+
+    # These flags are not supported on all architectures
+    # https://github.com/re-Isearch/re-Isearch/issues/14
+    substituteInPlace build/Makefile.ubuntu \
+      --replace-fail "-msse2" "" \
+      --replace-fail "-m64" ""
   '';
 
   nativeBuildInputs = [ writableTmpDirAsHomeHook ];
@@ -36,23 +46,23 @@ stdenv.mkDerivation (finalAttr: {
   ];
 
   makeFlags = [
-    "CC=g++"
-    "cc=gcc"
-    "LD=g++"
+    "CC=${stdenv.cc.targetPrefix}c++"
+    "cc=${stdenv.cc.targetPrefix}cc"
+    "LD=${stdenv.cc.targetPrefix}c++"
   ];
 
   preBuild = ''
     cd build
-    make clean # clean up pre-built objects in the source
     makeFlagsArray+=(
-      EXTRA_INC="-I${db.dev}/include -I${lib.getDev file}/include"
+      EXTRA_INC="-I${lib.getDev db}/include -I${lib.getDev file}/include"
       LD_PATH="-L../lib -L${db.out}/lib -L${file}/lib -L${libnsl}/lib"
     )
   '';
 
-  preInstall = ''
-    mkdir -p $out/{bin,lib}
-  '';
+  # Handwritten Makefiles, doesn't properly ensure that libraries are built before they're used in linking
+  # ld: cannot find -libUtils: No such file or directory
+  # ld: cannot find -libLocal: No such file or directory
+  enableParallelBuilding = false;
 
   installPhase = ''
     runHook preInstall
@@ -65,12 +75,16 @@ stdenv.mkDerivation (finalAttr: {
     runHook postInstall
   '';
 
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
+
   meta = {
     description = "Novel multimodal search and retrieval engine";
     homepage = "https://nlnet.nl/project/Re-iSearch/";
     license = lib.licenses.asl20;
-    platforms = [ "x86_64-linux" ];
+    platforms = lib.platforms.linux;
     maintainers = [ lib.maintainers.astro ];
     teams = [ lib.teams.ngi ];
   };
-})
+}

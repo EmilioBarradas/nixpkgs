@@ -7,16 +7,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "just-lsp";
-  version = "0.2.0";
+  version = "0.2.5";
 
   src = fetchFromGitHub {
     owner = "terror";
     repo = "just-lsp";
     tag = finalAttrs.version;
-    hash = "sha256-c/fdj4lEmID4u97fGPXnPLULS7Rxe6P8icmsfjGjT+w=";
+    hash = "sha256-cHDkcUsrrz71GqchkKT4yU1h6WzrT/zZPs95MJvb2tU=";
   };
 
-  cargoHash = "sha256-qPMtYaCvSAnLXrLX20QKbgXo9L1HYxJW4uZIzXhpD/A=";
+  cargoHash = "sha256-0CgwovZ9AtQs5AHulKxe1jHxG+EcyrCUyoEpxV/oDxY=";
 
   passthru = {
     updateScript = nix-update-script { };

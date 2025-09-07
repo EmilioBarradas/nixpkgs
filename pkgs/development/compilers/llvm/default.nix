@@ -5,7 +5,6 @@
   buildPackages,
   targetPackages,
   stdenv,
-  gcc12Stdenv,
   pkgs,
   recurseIntoAttrs,
   # This is the default binutils, but with *this* version of LLD rather
@@ -31,13 +30,15 @@ let
     "17.0.6".officialRelease.sha256 = "sha256-8MEDLLhocshmxoEBRSKlJ/GzJ8nfuzQ8qn0X/vLA+ag=";
     "18.1.8".officialRelease.sha256 = "sha256-iiZKMRo/WxJaBXct9GdAcAT3cz9d9pnAcO1mmR6oPNE=";
     "19.1.7".officialRelease.sha256 = "sha256-cZAB5vZjeTsXt9QHbP5xluWNQnAHByHtHnAhVDV0E6I=";
-    "20.1.3".officialRelease.sha256 = "sha256-sOl90iRBlD+DGJs72JrP9cJz6XmWs/5PL+uW4nt6LA0=";
-    "21.0.0-git".gitRelease = {
-      rev = "ebba554a3211b0b98d3ae33ba70f9d6ceaab6ad4";
-      rev-version = "21.0.0-unstable-2025-04-13";
-      sha256 = "sha256-8LcHMrbt9qlwqbHrv1rwYI3ZC1Y5POHzx5HgyciTPuY=";
+    "20.1.8".officialRelease.sha256 = "sha256-ysyB/EYxi2qE9fD5x/F2zI4vjn8UDoo1Z9ukiIrjFGw=";
+    "21.1.0".officialRelease.sha256 = "sha256-4DLEZuhREHMl2t0f1iqvXSRSE5VBMVxd94Tj4m8Yf9s=";
+    "22.0.0-git".gitRelease = {
+      rev = "0b42e117c829c6e127ef4b1bd82807ba01853128";
+      rev-version = "22.0.0-unstable-2025-08-31";
+      sha256 = "sha256-rClCPbTYqw0ZO9dJqJn3bqtuu9yxwcEfJs3vAW2xjAc=";
     };
-  } // llvmVersions;
+  }
+  // llvmVersions;
 
   mkPackage =
     {
@@ -79,17 +80,10 @@ let
               ;
           }
           // packageSetArgs # Allow overrides.
-          // {
-            stdenv =
-              if (lib.versions.major release_version == "13" && stdenv.cc.cc.isGNU or false) then
-                gcc12Stdenv
-              else
-                stdenv; # does not build with gcc13
-          }
         )
       )
     );
 
   llvmPackages = lib.mapAttrs' (version: args: mkPackage (args // { inherit version; })) versions;
 in
-llvmPackages // { inherit mkPackage; }
+llvmPackages // { inherit mkPackage versions; }

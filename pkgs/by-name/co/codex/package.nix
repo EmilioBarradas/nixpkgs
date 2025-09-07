@@ -1,33 +1,74 @@
 {
   lib,
-  buildNpmPackage,
+  stdenv,
+  rustPlatform,
   fetchFromGitHub,
+  installShellFiles,
+  nix-update-script,
+  pkg-config,
+  openssl,
   versionCheckHook,
+  installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
-
-buildNpmPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "codex";
-  version = "0.1.2504161510"; # from codex-cli/package.json
+  version = "0.30.0";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
-    rev = "b0ccca555685b1534a0028cb7bfdcad8fe2e477a";
-    hash = "sha256-WTnP6HZfrMjUoUZL635cngpfvvjrA2Zvm74T2627GwA=";
+    tag = "rust-v${finalAttrs.version}";
+    hash = "sha256-9dWVf5Q7sDfAbRIGvUqqwEouJRnS//ujlFvqZ/a8zBk=";
   };
 
-  sourceRoot = "${src.name}/codex-cli";
+  sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
-  npmDepsHash = "sha256-riVXC7T9zgUBUazH5Wq7+MjU1FepLkp9kHLSq+ZVqbs=";
+  cargoHash = "sha256-qJn2oN/9LVLhHnaNp+x9cUEMODrGrgV3SiR0ykIx7B4=";
+
+  nativeBuildInputs = [
+    installShellFiles
+    pkg-config
+  ];
+
+  buildInputs = [ openssl ];
+
+  # NOTE: part of the test suite requires access to networking, local shells,
+  # apple system configuration, etc. since this is a very fast moving target
+  # (for now), with releases happening every other day, constantly figuring out
+  # which tests need to be skipped, or finding workarounds, was too burdensome,
+  # and in practice not adding any real value. this decision may be reversed in
+  # the future once this software stabilizes.
+  doCheck = false;
+
+  postInstall = lib.optionalString installShellCompletions ''
+    installShellCompletion --cmd codex \
+      --bash <($out/bin/codex completion bash) \
+      --fish <($out/bin/codex completion fish) \
+      --zsh <($out/bin/codex completion zsh)
+  '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru = {
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--version-regex"
+        "^rust-v(\\d+\\.\\d+\\.\\d+)$"
+      ];
+    };
+  };
+
   meta = {
     description = "Lightweight coding agent that runs in your terminal";
     homepage = "https://github.com/openai/codex";
+    changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.asl20;
-    maintainers = [ lib.maintainers.malo ];
     mainProgram = "codex";
+    maintainers = with lib.maintainers; [
+      malo
+      delafthi
+    ];
+    platforms = lib.platforms.unix;
   };
-}
+})

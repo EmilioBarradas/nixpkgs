@@ -1,5 +1,4 @@
 {
-  darwin,
   fetchFromGitea,
   installShellFiles,
   lib,
@@ -20,25 +19,13 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-wf9Ve7focNBo6fGsjBQpTIx+DtxOo73AIQ9uoV8Q88Q=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-LmLMTnNwxih5HcrMUmQpVdIVz4KeHxcOFtOrNqgGPkA=";
   nativeBuildInputs = [
     pkg-config
     installShellFiles
   ];
 
-  buildInputs =
-    [ openssl ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin (
-      let
-        d = darwin.apple_sdk.frameworks;
-      in
-      [
-        d.CoreServices
-        d.Security
-        d.SystemConfiguration
-      ]
-    );
+  buildInputs = [ openssl ];
 
   postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd berg \

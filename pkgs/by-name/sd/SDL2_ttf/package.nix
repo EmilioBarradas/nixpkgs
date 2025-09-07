@@ -1,7 +1,6 @@
 {
   lib,
   SDL2,
-  darwin,
   fetchurl,
   freetype,
   harfbuzz,
@@ -27,18 +26,14 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs =
-    [
-      SDL2
-      freetype
-      harfbuzz
-    ]
-    ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
-      libGL
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      darwin.libobjc
-    ];
+  buildInputs = [
+    SDL2
+    freetype
+    harfbuzz
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
+    libGL
+  ];
 
   configureFlags = [
     (lib.enableFeature false "harfbuzz-builtin")

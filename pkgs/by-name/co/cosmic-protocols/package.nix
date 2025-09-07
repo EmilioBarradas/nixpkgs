@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation {
   pname = "cosmic-protocols";
-  version = "0-unstable-2025-04-14";
+  version = "0-unstable-2025-09-01";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-protocols";
-    rev = "67df697105486fa4c9dd6ce00889c8b0526c9bb4";
-    hash = "sha256-rogV5BTloAatfinrgl7I6hakybLkPRKhnwlILBGKkQU=";
+    rev = "6254f50abc6dbfccadc6939f80e20081ab5f9d51";
+    hash = "sha256-gOYgz07RGZoBp2RbHn0jUGLGXH/geoch/Y27Qh+jBao=";
   };
 
   makeFlags = [ "PREFIX=${placeholder "out"}" ];

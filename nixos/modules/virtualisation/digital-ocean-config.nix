@@ -39,7 +39,7 @@ with lib;
     in
     mkMerge [
       {
-        fileSystems."/" = lib.mkImageMediaOverride {
+        fileSystems."/" = lib.mkDefault {
           device = "/dev/disk/by-label/nixos";
           autoResize = true;
           fsType = "ext4";
@@ -100,10 +100,11 @@ with lib;
           };
           unitConfig = {
             ConditionPathExists = "!${doMetadataFile}";
-            After =
-              [ "network-pre.target" ]
-              ++ optional config.networking.dhcpcd.enable "dhcpcd.service"
-              ++ optional config.systemd.network.enable "systemd-networkd.service";
+            After = [
+              "network-pre.target"
+            ]
+            ++ optional config.networking.dhcpcd.enable "dhcpcd.service"
+            ++ optional config.systemd.network.enable "systemd-networkd.service";
           };
         };
 
@@ -144,7 +145,7 @@ with lib;
         systemd.services.digitalocean-set-hostname = mkIf (hostName == "") {
           path = [
             pkgs.curl
-            pkgs.nettools
+            pkgs.net-tools
           ];
           description = "Set hostname provided by Digitalocean";
           wantedBy = [ "network.target" ];

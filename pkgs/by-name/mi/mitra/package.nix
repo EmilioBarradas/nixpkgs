@@ -6,18 +6,17 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "mitra";
-  version = "3.23.0";
+  version = "4.9.0";
 
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "silverpill";
     repo = "mitra";
     rev = "v${version}";
-    hash = "sha256-QE/K9Hhu7e1y1JzuA8YxRTGDV6uAoSA+h1iWXH/4M8g=";
+    hash = "sha256-2/BQ0AScDCns9ddmr3VdFn6+eDnfzFoDHdxLVKvFEL8=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-JmX4Cbpj5gA0XWA5NQLfyFAQnoJmRCOaiNew96sWABI=";
+  cargoHash = "sha256-kwFoPnR8Wq/iqnc3TG/foqhMmRQk7VQ1UF50jyp970w=";
 
   # require running database
   doCheck = false;

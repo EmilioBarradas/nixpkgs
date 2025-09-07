@@ -8,13 +8,13 @@
 }:
 buildGoModule rec {
   pname = "lazygit";
-  version = "0.49.0";
+  version = "0.55.0";
 
   src = fetchFromGitHub {
     owner = "jesseduffield";
-    repo = pname;
+    repo = "lazygit";
     tag = "v${version}";
-    hash = "sha256-hNEznDz+DHalKgmz1fXFivf9T1YJ/jfwcD4baTUO4Cw=";
+    hash = "sha256-gx9l7MHWQGnLsD+L+SM+KzBgU8RLtpZG+66pPyerZW4=";
   };
 
   vendorHash = null;
@@ -45,7 +45,6 @@ buildGoModule rec {
       Br1ght0ne
       equirosa
       khaneliman
-      paveloom
       starsep
       sigmasquadron
     ];

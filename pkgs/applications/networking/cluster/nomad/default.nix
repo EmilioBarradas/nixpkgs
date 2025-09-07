@@ -5,38 +5,48 @@
   fetchFromGitHub,
   nixosTests,
   installShellFiles,
-}: let
-  generic = {
-    buildGoModule,
-    version,
-    sha256,
-    vendorHash,
-    license,
-    ...
-  } @ attrs: let
-    attrs' = builtins.removeAttrs attrs [
-      "buildGoModule"
-      "version"
-      "sha256"
-      "vendorHash"
-      "license"
-    ];
-  in
+}:
+
+let
+  generic =
+    {
+      buildGoModule,
+      version,
+      hash,
+      vendorHash,
+      license,
+      ...
+    }@attrs:
+    let
+      attrs' = builtins.removeAttrs attrs [
+        "buildGoModule"
+        "version"
+        "hash"
+        "vendorHash"
+        "license"
+      ];
+    in
     buildGoModule (
       rec {
         pname = "nomad";
         inherit version vendorHash;
 
-        subPackages = ["."];
+        subPackages = [ "." ];
 
         src = fetchFromGitHub {
           owner = "hashicorp";
           repo = pname;
           rev = "v${version}";
-          inherit sha256;
+          inherit hash;
         };
 
-        nativeBuildInputs = [installShellFiles];
+        # Nomad requires Go 1.24.6, but nixpkgs doesn't have it in unstable yet.
+        postPatch = ''
+          substituteInPlace go.mod \
+            --replace-warn "go 1.24.6" "go 1.24.5"
+        '';
+
+        nativeBuildInputs = [ installShellFiles ];
 
         ldflags = [
           "-X github.com/hashicorp/nomad/version.Version=${version}"
@@ -47,7 +57,7 @@
         # ui:
         #  Nomad release commits include the compiled version of the UI, but the file
         #  is only included if we build with the ui tag.
-        tags = ["ui"];
+        tags = [ "ui" ];
 
         postInstall = ''
           echo "complete -C $out/bin/nomad nomad" > nomad.bash
@@ -55,13 +65,12 @@
         '';
 
         meta = with lib; {
-          homepage = "https://www.nomadproject.io/";
+          homepage = "https://developer.hashicorp.com/nomad";
           description = "Distributed, Highly Available, Datacenter-Aware Scheduler";
           mainProgram = "nomad";
           inherit license;
           maintainers = with maintainers; [
             rushmorem
-            pradeepchhetri
             techknowlogick
             cottand
           ];
@@ -69,7 +78,8 @@
       }
       // attrs'
     );
-in rec {
+in
+rec {
   # Nomad never updates major go versions within a release series and is unsupported
   # on Go versions that it did not ship with. Due to historic bugs when compiled
   # with different versions we pin Go for all versions.
@@ -80,9 +90,21 @@ in rec {
 
   nomad_1_10 = generic {
     buildGoModule = buildGo124Module;
-    version = "1.10.0";
-    sha256 = "sha256-WtxlgmtYASDm8JjSKF+laBO53EL6ZM36ecASMXXr4p8=";
-    vendorHash = "sha256-a6lPhWfs9R6C+cgCecLara1ZqpS1WPngp6Z4nF3WwQQ=";
+    version = "1.10.4";
+    hash = "sha256-lQtKSU0wcrU+HEUc6N/svpf5uAaWK68G5kY/tI2Sy8Q=";
+    vendorHash = "sha256-tclD02oinoypx80TLni+DUpB5mYKRBqsmScp2VsUDc0=";
+    license = lib.licenses.bsl11;
+    passthru.tests.nomad = nixosTests.nomad;
+    preCheck = ''
+      export PATH="$PATH:$NIX_BUILD_TOP/go/bin"
+    '';
+  };
+
+  nomad_1_9 = generic {
+    buildGoModule = buildGo124Module;
+    version = "1.9.7";
+    hash = "sha256-U02H6DPr1friQ9EwqD/wQnE2Fm20OE5xNccPDJfnsqI=";
+    vendorHash = "sha256-9GnwqkexJAxrhW9yJFaDTdSaZ+p+/dcMuhlusp4cmyw=";
     license = lib.licenses.bsl11;
     passthru.tests.nomad = nixosTests.nomad;
     preCheck = ''

@@ -23,6 +23,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-edit";
   version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-edit";
@@ -30,7 +31,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     hash = "sha256-mgUSkYtc+i9pXv0n3zLHwBXFxfeWlhbsFJKa7X+mI98=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-qfPLDgGeYGSO0ZKJooXRK0NnTqzJ6zq6RhBpTTUusQY=";
 
   # COSMIC applications now uses vergen for the About page

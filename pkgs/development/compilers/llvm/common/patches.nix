@@ -49,7 +49,17 @@
   ];
   "llvm/gnu-install-dirs.patch" = [
     {
+      after = "22";
+      path = ../22;
+    }
+    {
+      after = "21";
+      before = "22";
+      path = ../21;
+    }
+    {
       after = "20";
+      before = "21";
       path = ../20;
     }
     {
@@ -194,6 +204,12 @@
     }
   ];
   "lldb/resource-dir.patch" = [
+    {
+      before = "16";
+      path = ../12;
+    }
+  ];
+  "llvm/no-pipes.patch" = [
     {
       before = "16";
       path = ../12;

@@ -13,9 +13,7 @@
   buildPackages,
 
   # Build inputs
-  ApplicationServices,
   expat,
-  Foundation,
   glib,
   libxml2,
   python3,
@@ -34,7 +32,7 @@
   libjpeg,
   libjxl,
   librsvg,
-  libspng,
+  libpng,
   libtiff,
   libwebp,
   matio,
@@ -61,7 +59,8 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "man"
     "dev"
-  ] ++ lib.optionals (!stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD) [ "devdoc" ];
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD) [ "devdoc" ];
 
   src = fetchFromGitHub {
     owner = "libvips";
@@ -75,69 +74,63 @@ stdenv.mkDerivation (finalAttrs: {
     '';
   };
 
-  nativeBuildInputs =
-    [
-      docbook-xsl-nons
-      gobject-introspection
-      meson
-      ninja
-      pkg-config
-    ]
-    ++ lib.optionals (!stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD) [
-      gtk-doc
-    ];
+  nativeBuildInputs = [
+    docbook-xsl-nons
+    gobject-introspection
+    meson
+    ninja
+    pkg-config
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD) [
+    gtk-doc
+  ];
 
-  buildInputs =
-    [
-      glib
-      libxml2
-      expat
-      (python3.withPackages (p: [ p.pycairo ]))
+  buildInputs = [
+    glib
+    libxml2
+    expat
+    (python3.withPackages (p: [ p.pycairo ]))
 
-      # Optional dependencies
-      cfitsio
-      cgif
-      fftw
-      imagemagick
-      lcms2
-      libarchive
-      libexif
-      libheif
-      libhwy
-      libimagequant
-      libjpeg
-      libjxl
-      librsvg
-      libspng
-      libtiff
-      libwebp
-      matio
-      openexr
-      openjpeg
-      openslide
-      pango
-      poppler
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      ApplicationServices
-      Foundation
-    ];
+    # Optional dependencies
+    cfitsio
+    cgif
+    fftw
+    imagemagick
+    lcms2
+    libarchive
+    libexif
+    libheif
+    libhwy
+    libimagequant
+    libjpeg
+    libjxl
+    librsvg
+    libpng
+    libtiff
+    libwebp
+    matio
+    openexr
+    openjpeg
+    openslide
+    pango
+    poppler
+  ];
 
   # Required by .pc file
   propagatedBuildInputs = [
     glib
   ];
 
-  mesonFlags =
-    [
-      (lib.mesonEnable "pdfium" false)
-      (lib.mesonEnable "nifti" false)
-      (lib.mesonEnable "introspection" withIntrospection)
-    ]
-    ++ lib.optional (!stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD) (
-      lib.mesonBool "gtk_doc" true
-    )
-    ++ lib.optional (imagemagick == null) (lib.mesonEnable "magick" false);
+  mesonFlags = [
+    (lib.mesonEnable "pdfium" false)
+    (lib.mesonEnable "nifti" false)
+    (lib.mesonEnable "spng" false) # we want to use libpng
+    (lib.mesonEnable "introspection" withIntrospection)
+  ]
+  ++ lib.optional (!stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD) (
+    lib.mesonBool "gtk_doc" true
+  )
+  ++ lib.optional (imagemagick == null) (lib.mesonEnable "magick" false);
 
   passthru = {
     tests = {

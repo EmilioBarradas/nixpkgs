@@ -5,7 +5,7 @@
   rustPlatform,
   installShellFiles,
   writableTmpDirAsHomeHook,
-  git,
+  gitMinimal,
   nixosTests,
   buildPackages,
 }:
@@ -17,45 +17,39 @@ rustPlatform.buildRustPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "starship";
     repo = "starship";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-5Euhbuu1uiJ5HJNlPs9sUoGcc5QWqXqNmEH0jpfGLlc=";
   };
 
   nativeBuildInputs = [ installShellFiles ];
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [ writableTmpDirAsHomeHook ];
+  buildInputs = lib.optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) [
+    writableTmpDirAsHomeHook
+  ];
 
-  # tries to access HOME only in aarch64-darwin environment when building mac-notification-sys
-  preBuild = lib.optionalString (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) ''
-    export HOME=$TMPDIR
-  '';
-
-  postInstall =
+  postInstall = ''
+    presetdir=$out/share/starship/presets/
+    mkdir -p $presetdir
+    cp docs/public/presets/toml/*.toml $presetdir
+  ''
+  + lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (
+    let
+      emulator = stdenv.hostPlatform.emulator buildPackages;
+    in
     ''
-      presetdir=$out/share/starship/presets/
-      mkdir -p $presetdir
-      cp docs/public/presets/toml/*.toml $presetdir
+      installShellCompletion --cmd starship \
+        --bash <(${emulator} $out/bin/starship completions bash) \
+        --fish <(${emulator} $out/bin/starship completions fish) \
+        --zsh <(${emulator} $out/bin/starship completions zsh)
     ''
-    + lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (
-      let
-        emulator = stdenv.hostPlatform.emulator buildPackages;
-      in
-      ''
-        installShellCompletion --cmd starship \
-          --bash <(${emulator} $out/bin/starship completions bash) \
-          --fish <(${emulator} $out/bin/starship completions fish) \
-          --zsh <(${emulator} $out/bin/starship completions zsh)
-      ''
-    );
+  );
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-cxDWaPlNK7POJ3GhA21NlJ6q62bqHdA/4sru5pLkvOA=";
 
-  nativeCheckInputs = [ git ];
-
-  preCheck = ''
-    HOME=$TMPDIR
-  '';
+  nativeCheckInputs = [
+    gitMinimal
+    writableTmpDirAsHomeHook
+  ];
 
   passthru.tests = {
     inherit (nixosTests) starship;

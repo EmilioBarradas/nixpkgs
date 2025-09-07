@@ -17,17 +17,22 @@ buildGoModule (finalAttrs: {
     webkitgtk_4_1
   ];
   pname = "paretosecurity";
-  version = "0.2.12";
+  version = "0.3.3";
 
   src = fetchFromGitHub {
     owner = "ParetoSecurity";
     repo = "agent";
     rev = finalAttrs.version;
-    hash = "sha256-skBxDPC+C8JU1CW6g3SA2C4IawaoPzVi8pdl5BCutUY=";
+    hash = "sha256-IZrpGwm+j1jcKtcM23lcycOlLUuGerF41fWanWBgr40=";
   };
 
-  vendorHash = "sha256-YnyACP/hJYxi4AWMwr0We4YUTbWwahKAIYN6RnHmzls=";
+  vendorHash = "sha256-DlCGCheJHa4HPM7kfX/UbOfLukAiaoP7QZnabkZVASM=";
   proxyVendor = true;
+
+  # Skip building the Windows installer
+  preBuild = ''
+    rm -rf cmd/paretosecurity-installer
+  '';
 
   ldflags = [
     "-s"
@@ -73,7 +78,7 @@ buildGoModule (finalAttrs: {
   };
 
   meta = {
-    description = "Pareto Security agent makes sure your laptop is correctly configured for security.";
+    description = "Agent that makes sure your laptop is correctly configured for security";
     longDescription = ''
       The Pareto Security agent is a free and open source app to help you make
       sure that your laptop is configured for security.
